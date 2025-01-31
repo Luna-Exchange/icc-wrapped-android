@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.icc.iccwrapped.Environment
 import com.icc.iccwrapped.IccWrappedActivity
 import com.icc.iccwrapped.User
+import com.iccfan.passport.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
