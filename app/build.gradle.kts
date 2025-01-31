@@ -44,5 +44,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    implementation(project(mapOf("path" to ":iccwrapped")))
     androidTestImplementation(libs.androidx.espresso.core)
 }
