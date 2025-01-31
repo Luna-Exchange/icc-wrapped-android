@@ -1,9 +1,7 @@
 An Android SDK that provides a simple way to launch a web view in Android applications.
 
-Contents
+*Contents*
 
-Steps to Install
-Authentication Flow
 Steps to Install
 
 Add the dependency to your build.gradle.
