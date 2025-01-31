@@ -1,0 +1,22 @@
+package com.icc.iccwrapped
+
+class EnvConfig(private val environment: Environment = Environment.DEVELOPMENT) {
+
+    val iccUi : String
+        get() = if (environment == Environment.DEVELOPMENT) "https://icc-wrapped-stg.insomnialabs.xyz" else "https://wrapped.icc-cricket.com"
+
+    val iccApi : String
+        get() = if (environment == Environment.DEVELOPMENT) "https://icc-fan-passport-stg-api.insomnialabs.xyz" else "https://passport-api.icc-cricket.com"
+
+}
+
+
+enum class Environment {
+    DEVELOPMENT,
+    PRODUCTION
+}
+
+enum class SdkActions {
+    DEFAULT,
+    SIGN_IN,
+}
