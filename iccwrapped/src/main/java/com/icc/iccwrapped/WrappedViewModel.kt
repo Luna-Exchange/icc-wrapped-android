@@ -1,6 +1,7 @@
 package com.icc.iccwrapped
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,15 +26,14 @@ class WrappedViewModel : ViewModel() {
                 val service = WrappedApiClient.create(baseUrl)
                 val tokenFlow = flow {
                     emit(service.encode(user))
-                }
-                    .catch {
+                }.catch {
                         mToken.emit(Result.Failed(it.message ?: ""))
                     }
                 tokenFlow.collect {
                     mToken.emit(Result.Success(it.data.token))
                 }
             } catch (e: Exception) {
-
+                Log.e("TAG", "unabke to encode user ${e.message}")
             }
         }
     }
