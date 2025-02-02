@@ -31,6 +31,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_icc_wrapped)
+        setupAndOpenWrapped()
     }
 
     private fun setupAndOpenWrapped() {
@@ -48,7 +49,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     private fun setupViews() {
         progressBar = findViewById(R.id.progress_bar)
         background = findViewById(R.id.constraint_layout)
-        arguments = intent.getParcelableExtra("PARAM_EXTRA")
+        arguments = intent.getParcelableExtra(PARAM_EXTRA)
     }
 
     private fun setupWebView() {
@@ -117,20 +118,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     }
 
     private fun loadUrlBasedOnActions() {
-        var url = config.iccUi
-        val token = sharedPrefProvider.getAccessToken()
-        when (arguments!!.action) {
-            SdkActions.SIGN_IN -> {
-                url =
-                    "${config.iccUi}${arguments?.entryPoint}?passport_access=${token}&icc_client=mobile_app"
-            }
-
-           SdkActions.DEFAULT -> {
-                clearWebViewCache()
-                url = config.iccUi
-            }
-        }
-        loadUrlWithWebView(url)
+        loadUrlWithWebView(config.iccUi)
     }
 
     private fun loadUrlWithWebView(url: String) {
@@ -143,7 +131,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     }
 
 
-     override fun onAuthenticateWithIcc() {
+    override fun onAuthenticateWithIcc() {
         SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
         onAuthenticate?.signIn()
     }
@@ -179,7 +167,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
         window.parent.addEventListener('goToStayInTheGame', function(event) {
             Android.receiveStayInTheGameEvent(JSON.stringify(event));
         });
-        window.parent.addEventListener('closeWrap', function(event) {
+        window.parent.addEventListener('closeIccWrapped', function(event) {
             Android.receiveCloseWrappedEvent(JSON.stringify(event));
     });
         }
@@ -190,6 +178,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
 
     companion object {
+        const val PARAM_EXTRA = "PARAM_EXTRA"
         private var onAuthenticate: OnAuthenticate? = null
 
         fun launch(
@@ -216,7 +205,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
             sharedPrefProvider.saveAccessToken(token)
             this.onAuthenticate = onAuthenticate
             val intent = Intent(context, IccWrappedActivity::class.java)
-            intent.putExtra("PARAM_EXTRA", sdkParam)
+            intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
         }
 

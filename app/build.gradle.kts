@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.iccfan.passport"
+    namespace = "com.iccfan.iccwrapped"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.iccfan.passport"
+        applicationId = "com.iccfan.iccwrapped"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
