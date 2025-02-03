@@ -35,7 +35,7 @@ interface OnJavScriptInterface{
 
     fun onAuthenticateWithIcc()
 
-    fun onDeepLinkToStayInGame() {}
+    fun onDeepLinkToStayInGame()
 
     fun onClose() {}
 }
