@@ -1,23 +1,36 @@
+# ICC Wrapped Android SDK
+
 An Android SDK that provides a simple way to launch a web view in Android applications.
 
-*Contents*
+---
 
-Steps to Install
+## 📜 Contents
+- [Installation](#installation)
+- [Launching the SDK](#launching-the-sdk)
+- [Launch Arguments](#launch-arguments)
+- [Authentication Flow](#authentication-flow)
 
-Add the dependency to your build.gradle.
-Kotlin
+---
 
+## 🚀 Installation
+
+### 1️⃣ Add the Dependency
+
+#### **Kotlin DSL**
+```kotlin
 implementation("com.github.Luna-Exchange:icc-wrapped-android:x.x.x")
+```
 
-Groovy
+#### **Groovy DSL**
+```groovy
+implementation 'com.github.Luna-Exchange:icc-wrapped-android:x.x.x'
+```
+Replace `x.x.x` with the latest version (`1.0.0`).
 
-implementation 'com.github.Luna-Exchange:icc-wrapped-android:Tag
+### 2️⃣ Configure `settings.gradle`
 
-where x.x.x is the latest version 1.0.0
-
-In settings.gradle
-Kotlin
-
+#### **Kotlin DSL**
+```kotlin
 dependencyResolutionManagement {
     repositories {
         google()
@@ -25,59 +38,96 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
     }
 }
+```
 
-Groovy
-
+#### **Groovy DSL**
+```groovy
 dependencyResolutionManagement {
-		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-		repositories {
-			mavenCentral()
-			maven { url 'https://jitpack.io' }
-		}
-	}
-Sync the project.
-**Launch this SDK **
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
 
-When a user is authenticated.
-     IccWrappedActivity.launch(this, user)
-When a user is not authenticated.
-     IccWrappedActivity.launch(context = this, onAuthenticate = onAuthenticate)
-To Delegate Sign in to ICC after Signin has been clicked on the SDK
+### 3️⃣ Sync the project
+Run a Gradle sync in your Android project.
 
-        val onAuthenticate = object : OnAuthenticate {
-            override fun signIn()  {
-                val user = User(email, authToken, name)
-                IccWrappedActivity.launch(this@MainActivity, user, onAuthenticate)
-            }
-        }
+---
 
-Launch Arguments
+## 📲 Launching the SDK
 
-This is a function that helps launch the SDK. It accepts optional arguments that include;
+### **When a user is authenticated**
+```kotlin
+IccWrappedActivity.launch(this, user)
+```
 
-context.
-user of type User.
-
-val userData = User(
-    token: "user_token",
-    name: "User Name",
-    email: "user@example.com"
+### **When a user is not authenticated**
+```kotlin
+IccWrappedActivity.launch(
+    context = this,
+    onAuthenticate = onAuthenticate
 )
-environment of enum type Environment: To declare the environment.
-an interface helps with sign-in delegation when the user attempts to sign in to fanpassport.
+```
 
+### **Delegate Sign-in to ICC**
+If sign-in is required after clicking a login button in the SDK, implement the `OnAuthenticate` interface:
 
-Environment DEVELOPMENT, PRODUCTION
+```kotlin
+val onAuthenticate = object : OnAuthenticate {
+    override fun signIn() {
+        val user = User(email, authToken, name)
+        IccWrappedActivity.launch(this@MainActivity, user, onAuthenticate)
+    }
+}
+```
 
-Authentication Flow
+---
 
-This flow caters to users who use fan passports without getting authenticated via the ICC app. The expectation is that when calling the Sdk, an interface should be passed as an argument. e.g
+## 🏗️ Launch Arguments
+The SDK launch function accepts optional arguments:
 
-  val onAuthenticate = object : OnAuthenticate {
-            override fun signIn()  {
-                val param = SdkParam(user)
-                IccWrappedActivity.launch(this@MainActivity, param, null)
-            }
-        }
-In this interface, a signIn() function handles authentication and then calls the SDK with the user object, as shown above. Therefore, this flow is executed when sign-in is clicked on the WebView, and the user is authenticated on a fan passport.
+### **User Data**
+```kotlin
+val userData = User(
+    token = "user_token",
+    name = "User Name",
+    email = "user@example.com"
+)
+```
 
+### **Environment**
+The `Environment` enum is used to specify the SDK environment:
+
+```kotlin
+enum class Environment {
+    DEVELOPMENT,
+    PRODUCTION
+}
+```
+
+### **Authentication Delegation**
+This interface helps with sign-in delegation when the user attempts to sign in via **FanPassport**.
+
+---
+
+## 🔐 Authentication Flow
+This flow applies to users who use **FanPassport** without being authenticated via the ICC app.
+
+When calling the SDK, pass an authentication interface as an argument:
+
+```kotlin
+val onAuthenticate = object : OnAuthenticate {
+    override fun signIn() {
+        val param = SdkParam(user)
+        IccWrappedActivity.launch(this@MainActivity, param, null)
+    }
+}
+```
+
+In this interface, the `signIn()` function handles authentication and then launches the SDK with the user object.
+
+This flow is triggered when the **sign-in button is clicked on the WebView**, and the user is authenticated on **FanPassport**.
+
+---
