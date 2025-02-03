@@ -2,6 +2,7 @@ package com.icc.iccwrapped
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.ConsoleMessage
@@ -152,6 +153,13 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
         progressBar.visibility = View.VISIBLE
     }
 
+    override fun onDeepLinkToStayInGame() {
+        val stayInGameUri = arguments?.stayInGameUri.orEmpty()
+        val deepLinkUri = Uri.parse(stayInGameUri)
+        val intent = Intent(Intent.ACTION_VIEW, deepLinkUri)
+        startActivity(intent)
+    }
+
     override fun onPageFinished() {
         webView.visibility = View.VISIBLE
         progressBar.visibility = View.GONE
@@ -190,6 +198,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
         ) {
             val param = SdkParam(
                 environment = environment,
+                stayInGameUri = stayInGameUri
             )
             val sdkParam = if (user != null) {
                 param.copy(
@@ -223,7 +232,6 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
         webView.clearSslPreferences()
         WebStorage.getInstance().deleteAllData()
     }
-
 }
 
 
