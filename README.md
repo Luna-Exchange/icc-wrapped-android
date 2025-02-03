@@ -108,12 +108,12 @@ enum class Environment {
 ```
 
 ### **Authentication Delegation**
-This interface helps with sign-in delegation when the user attempts to sign in via **FanPassport**.
+This interface helps with sign-in delegation when the user attempts to sign in via **IccWrapped**.
 
 ---
 
 ## 🔐 Authentication Flow
-This flow applies to users who use **FanPassport** without being authenticated via the ICC app.
+This flow applies to users who use **IccWrapped** without being authenticated via the ICC app.
 
 When calling the SDK, pass an authentication interface as an argument:
 
@@ -128,6 +128,6 @@ val onAuthenticate = object : OnAuthenticate {
 
 In this interface, the `signIn()` function handles authentication and then launches the SDK with the user object.
 
-This flow is triggered when the **sign-in button is clicked on the WebView**, and the user is authenticated on **FanPassport**.
+This flow is triggered when the **sign-in button is clicked on the WebView**, and the user is authenticated on **IccWrapped**.
 
 ---
