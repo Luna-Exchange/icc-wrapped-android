@@ -73,7 +73,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
         val token = sharedPrefProvider.getAccessToken()
         if (token.isEmpty()) {
             clearWebViewCache()
-            val url = config.iccUi
+            val url = "${config.iccUi}?wrapped_access=${token}&icc_client=mobile_app"
             loadUrlWithWebView(url)
         } else {
             encodeUser(arguments?.user)
@@ -119,7 +119,9 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     }
 
     private fun loadUrlBasedOnActions() {
-        loadUrlWithWebView(config.iccUi)
+        val token = sharedPrefProvider.getAccessToken()
+        val url = "${config.iccUi}?wrapped_access=${token}&icc_client=mobile_app"
+        loadUrlWithWebView(url)
     }
 
     private fun loadUrlWithWebView(url: String) {
