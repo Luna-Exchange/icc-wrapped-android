@@ -44,7 +44,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'io.insomnialabs'
                 artifactId = 'wrapped'
-                version = '0.0.4-snapshot'
+                version = '1.0.2'
             }
         }
     }
@@ -57,7 +57,6 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
-    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.webkit:webkit:1.11.0'
     implementation 'androidx.browser:browser:1.8.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
