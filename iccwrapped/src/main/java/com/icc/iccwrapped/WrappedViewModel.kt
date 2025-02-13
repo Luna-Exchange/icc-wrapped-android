@@ -33,7 +33,7 @@ class WrappedViewModel : ViewModel() {
                     mToken.emit(Result.Success(it.data.token))
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "unabke to encode user ${e.message}")
+                Log.e("TAG", "unable to encode user ${e.message}")
             }
         }
     }
