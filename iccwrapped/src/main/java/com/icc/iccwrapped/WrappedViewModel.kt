@@ -1,7 +1,6 @@
 package com.icc.iccwrapped
 
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 
 class WrappedViewModel : ViewModel() {
 
@@ -33,7 +33,7 @@ class WrappedViewModel : ViewModel() {
                     mToken.emit(Result.Success(it.data.token))
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "unable to encode user ${e.message}")
+                Timber.tag("TAG").e("unable to encode user ${e.message}")
             }
         }
     }
@@ -54,7 +54,7 @@ data class User(val authToken: String, val name: String, val email: String) : Pa
 data class SdkParam(
     var user: User? = null,
     var entryPoint: String = "",
-    var environment: Environment = Environment.DEVELOPMENT,
+    var env: Env = Env.DEVELOPMENT,
     var action: SdkActions = SdkActions.DEFAULT,
     var stayInGameUri : String = ""
 ) : Parcelable
