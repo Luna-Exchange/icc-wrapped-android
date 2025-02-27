@@ -228,7 +228,6 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     override fun onAuthenticateWithIcc() {
             SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-            finish()
             onAuthenticate?.signIn()
     }
 

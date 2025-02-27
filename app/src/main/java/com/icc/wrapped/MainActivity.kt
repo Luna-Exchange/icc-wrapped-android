@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        IccWrappedActivity.launch(context = this, user = user, env = Env.DEVELOPMENT, onStayInGame = {
+        IccWrappedActivity.launch(context = this, env = Env.DEVELOPMENT, onStayInGame = {
             Toast.makeText(this, "we did it", Toast.LENGTH_LONG).show()
         }, onAuthenticate = onAuthenticate)
     }
