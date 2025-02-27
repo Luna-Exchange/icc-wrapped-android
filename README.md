@@ -25,7 +25,7 @@ implementation("com.github.Luna-Exchange:icc-wrapped-android:x.x.x")
 ```groovy
 implementation 'com.github.Luna-Exchange:icc-wrapped-android:x.x.x'
 ```
-Replace `x.x.x` with the latest version (`1.0.1`).
+Replace `x.x.x` with the latest version (`1.0.3`).
 
 ### 2️⃣ Configure `settings.gradle`
 
@@ -63,7 +63,7 @@ Run a Gradle sync in your Android project.
 IccWrappedActivity.launch(this, user)
 ```
 
-### **When a user is not authenticated**
+### **When a user is not authenticated**, where onAuthenticate is a callback where ICC can login and relaunch the SDK again.
 ```kotlin
 IccWrappedActivity.launch(
     context = this,
@@ -72,7 +72,7 @@ IccWrappedActivity.launch(
 ```
 
 ### **Delegate Sign-in to ICC**
-If sign-in is required after clicking a login button in the SDK, implement the `OnAuthenticate` interface:
+If sign-in is required after clicking a `enter recapped` button in the SDK, implement the `OnAuthenticate` interface:
 
 ```kotlin
 val onAuthenticate = object : OnAuthenticate {
@@ -82,6 +82,11 @@ val onAuthenticate = object : OnAuthenticate {
     }
 }
 ```
+
+### **Delegate Sign-in to ICC**
+`onStayInGame` is a function passed into the sdk during initialization it gets invoked when the ICC wrapped is completed and the user clicks on the `ICC CRICKET` button as shown below.
+
+![PHOTO-2025-02-27-16-03-15](https://github.com/user-attachments/assets/c5af385a-a0fe-4c55-86ff-22d414fd40c6)
 
 ---
 
@@ -110,6 +115,9 @@ enum class Environment {
 ### **Authentication Delegation**
 This interface helps with sign-in delegation when the user attempts to sign in via **IccWrapped**.
 
+
+### **Authentication Delegation**
+This interface helps  close the SDK, invoke a callback that the caller of the SDK can use to navigate to another part of the ICC APP after the wrapped experience is completed.
 ---
 
 ## 🔐 Authentication Flow
@@ -128,6 +136,6 @@ val onAuthenticate = object : OnAuthenticate {
 
 In this interface, the `signIn()` function handles authentication and then launches the SDK with the user object.
 
-This flow is triggered when the **sign-in button is clicked on the WebView**, and the user is authenticated on **IccWrapped**.
+This flow is triggered when the **`enter wrapped` button is clicked on the WebView**, and the user is authenticated on **IccWrapped**.
 
 ---
