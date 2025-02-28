@@ -26,7 +26,9 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.icc.iccwrapped.extensions.getImageUri
 import com.icc.iccwrapped.extensions.openShareSheet
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -110,47 +112,59 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         type: IccFileDownloadType = IccFileDownloadType.DOWNLOAD
     ) {
         if (url.startsWith("data:image")) {
-            downloadBase64Image(url, message, type)
+            lifecycleScope.launch {
+                downloadBase64Image(url, message, type)
+            }
         } else {
             Toast.makeText(this, "Unsupported URL format", Toast.LENGTH_SHORT).show()
         }
     }
 
 
-    private fun downloadBase64Image(base64Data: String, message: String = "", type: IccFileDownloadType) {
+    private suspend fun downloadBase64Image(
+        base64Data: String,
+        message: String = "",
+        type: IccFileDownloadType
+    ) {
         try {
-            if (type == IccFileDownloadType.DOWNLOAD) {
-                Toast.makeText(this, "downloading...", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main) {
+                if (type == IccFileDownloadType.DOWNLOAD) {
+                    Toast.makeText(this@IccRecappedActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                }
             }
+
             val base64Image = base64Data.substringAfter("base64,")
             val decodedBytes = android.util.Base64.decode(base64Image, android.util.Base64.DEFAULT)
             val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
-            val fileName = "icc_recapped_image${System.currentTimeMillis()}.png"
-            val file = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                fileName
-            )
+            val fileName = "icc_recapped_${System.currentTimeMillis()}.png"
+            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
 
-            val outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+            withContext(Dispatchers.IO) {
+                file.outputStream().use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
 
-            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            mediaScanIntent.data = Uri.fromFile(file)
-            sendBroadcast(mediaScanIntent)
+                val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).apply {
+                    data = Uri.fromFile(file)
+                }
+                sendBroadcast(mediaScanIntent)
+            }
 
-            if (type == IccFileDownloadType.SHARE) {
-                shareIccWrapped(getImageUri(file), message)
-            } else {
-                Toast.makeText(this, "Image downloaded", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main) {
+                when (type) {
+                    IccFileDownloadType.SHARE -> shareIccWrapped(getImageUri(file), message)
+                    IccFileDownloadType.DOWNLOAD -> Toast.makeText(this@IccRecappedActivity, "Image downloaded", Toast.LENGTH_SHORT).show()
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Failed to download image", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@IccRecappedActivity, "Failed to download image", Toast.LENGTH_SHORT).show()
+            }
         }
     }
+
 
     private fun shareIccWrapped(imageUri: Uri, message: String) {
         this.openShareSheet(imageUri, message)
