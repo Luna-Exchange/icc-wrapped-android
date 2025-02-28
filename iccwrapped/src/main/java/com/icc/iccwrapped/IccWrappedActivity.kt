@@ -335,6 +335,11 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onAuthenticate?.onNavigateBack()
+    }
+
     private fun clearWebViewCache() {
         webView.clearCache(true);
         webView.clearFormData()
@@ -347,8 +352,5 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
 interface OnAuthenticate {
     fun signIn()
-}
-
-enum class DownloadType {
-    DOWNLOAD, SHARE
+    fun onNavigateBack()
 }
