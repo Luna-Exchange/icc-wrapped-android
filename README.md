@@ -116,8 +116,8 @@ enum class Environment {
 This interface helps with sign-in delegation when the user attempts to sign in via **IccWrapped**.
 
 
-### **Authentication Delegation**
-This interface helps  close the SDK, invoke a callback that the caller of the SDK can use to navigate to another part of the ICC APP after the wrapped experience is completed.
+### **Stay in Game (onStayInGame) **
+This interface helps  close the SDK and invoke a callback that the SDK caller can use to navigate to another part of the ICC APP after the wrapped experience is completed.
 ---
 
 ## 🔐 Authentication Flow
