@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.icc.iccwrapped.Env
-import com.icc.iccwrapped.IccWrappedActivity
+import com.icc.iccwrapped.IccRecappedActivity
 import com.icc.iccwrapped.OnAuthenticate
 import com.icc.iccwrapped.User
 import com.iccfan.iccwrapped.R
@@ -27,13 +27,15 @@ class MainActivity : AppCompatActivity() {
                     name = "Iyanu Falaye",
                     email = "iyanuoluwa@insomnialabs.io"
                 )
-                IccWrappedActivity.launch(this@MainActivity, user, onStayInGame = {})
+                IccRecappedActivity.launch(this@MainActivity, user, onStayInGame = {})
+            }
+
+            override fun onNavigateBack() {
+                Toast.makeText(this@MainActivity, "On Navigate back", Toast.LENGTH_LONG).show()
             }
 
         }
 
-        IccWrappedActivity.launch(context = this, env = Env.DEVELOPMENT, onStayInGame = {
-            Toast.makeText(this, "we did it", Toast.LENGTH_LONG).show()
-        }, onAuthenticate = onAuthenticate)
+        IccRecappedActivity.launch(context = this, env = Env.DEVELOPMENT, onStayInGame = {}, onAuthenticate = onAuthenticate)
     }
 }

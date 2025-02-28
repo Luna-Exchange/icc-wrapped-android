@@ -33,7 +33,7 @@ import java.io.FileOutputStream
 
 const val STORAGE_PERMISSION_CODE = 1001
 
-class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebViewInterface {
+class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebViewInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -107,7 +107,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     private fun downloadFile(
         url: String,
         message: String,
-        type: DownloadType = DownloadType.DOWNLOAD
+        type: IccFileDownloadType = IccFileDownloadType.DOWNLOAD
     ) {
         if (url.startsWith("data:image")) {
             downloadBase64Image(url, message, type)
@@ -117,9 +117,9 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     }
 
 
-    private fun downloadBase64Image(base64Data: String, message: String = "", type: DownloadType) {
+    private fun downloadBase64Image(base64Data: String, message: String = "", type: IccFileDownloadType) {
         try {
-            if (type == DownloadType.DOWNLOAD) {
+            if (type == IccFileDownloadType.DOWNLOAD) {
                 Toast.makeText(this, "downloading...", Toast.LENGTH_SHORT).show()
             }
             val base64Image = base64Data.substringAfter("base64,")
@@ -141,7 +141,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
             mediaScanIntent.data = Uri.fromFile(file)
             sendBroadcast(mediaScanIntent)
 
-            if (type == DownloadType.SHARE) {
+            if (type == IccFileDownloadType.SHARE) {
                 shareIccWrapped(getImageUri(file), message)
             } else {
                 Toast.makeText(this, "Image downloaded", Toast.LENGTH_SHORT).show()
@@ -228,6 +228,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     override fun onAuthenticateWithIcc() {
             SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+            finish()
             onAuthenticate?.signIn()
     }
 
@@ -239,7 +240,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onShareRecapped(message: String, image: String) {
-        downloadFile(image, message, type = DownloadType.SHARE)
+        downloadFile(image, message, type = IccFileDownloadType.SHARE)
     }
 
     override fun onPageStarted() {
@@ -328,11 +329,16 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
             sharedPrefProvider.saveAccessToken(token)
             this.onAuthenticate = onAuthenticate
             this.onStayInGame = onStayInGame
-            val intent = Intent(context, IccWrappedActivity::class.java)
+            val intent = Intent(context, IccRecappedActivity::class.java)
             intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
         }
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onAuthenticate?.onNavigateBack()
     }
 
     private fun clearWebViewCache() {
@@ -347,8 +353,9 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
 interface OnAuthenticate {
     fun signIn()
+    fun onNavigateBack()
 }
 
-enum class DownloadType {
+enum class IccFileDownloadType {
     DOWNLOAD, SHARE
 }

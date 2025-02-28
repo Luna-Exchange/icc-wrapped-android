@@ -25,7 +25,7 @@ implementation("com.github.Luna-Exchange:icc-wrapped-android:x.x.x")
 ```groovy
 implementation 'com.github.Luna-Exchange:icc-wrapped-android:x.x.x'
 ```
-Replace `x.x.x` with the latest version (`1.0.3`).
+Replace `x.x.x` with the latest version (`1.0.4`).
 
 ### 2️⃣ Configure `settings.gradle`
 
@@ -60,15 +60,12 @@ Run a Gradle sync in your Android project.
 
 ### **When a user is authenticated**
 ```kotlin
-IccWrappedActivity.launch(this, user)
+     IccRecappedActivity.launch(context = this, user = user, env = Env.DEVELOPMENT, onStayInGame = {})
 ```
 
 ### **When a user is not authenticated**, where onAuthenticate is a callback where ICC can login and relaunch the SDK again.
 ```kotlin
-IccWrappedActivity.launch(
-    context = this,
-    onAuthenticate = onAuthenticate
-)
+     IccRecappedActivity.launch(context = this, env = Env.DEVELOPMENT, onStayInGame = {}, onAuthenticate = onAuthenticate)
 ```
 
 ### **Delegate Sign-in to ICC**
@@ -78,7 +75,7 @@ If sign-in is required after clicking a `enter recapped` button in the SDK, impl
 val onAuthenticate = object : OnAuthenticate {
     override fun signIn() {
         val user = User(email, authToken, name)
-        IccWrappedActivity.launch(this@MainActivity, user, onAuthenticate)
+        IccRecappedActivity.launch(this@MainActivity, user, onStayInGame = {})
     }
 }
 ```
@@ -91,7 +88,7 @@ val onAuthenticate = object : OnAuthenticate {
 ---
 
 ## 🏗️ Launch Arguments
-The SDK launch function accepts optional arguments:
+The SDK launch function accepts arguments:
 
 ### **User Data**
 ```kotlin
@@ -103,40 +100,42 @@ val userData = User(
 ```
 
 ### **Environment**
-The `Environment` enum is used to specify the SDK environment:
+The `Env` enum is used to specify the SDK environment:
 
 ```kotlin
-enum class Environment {
+enum class Env {
     DEVELOPMENT,
     PRODUCTION
 }
 ```
 
-### **Authentication Delegation**
-This interface helps with sign-in delegation when the user attempts to sign in via **IccRecapped**.
-
-
-### **Stay in Game (onStayInGame) **
+### **Stay in Game callback (onStayInGame) **
 This interface closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recapped experience is completed.
 
 ---
+### **Authentication Delegation**
+This interface helps with sign-in delegation when the user attempts to sign in via **IccRecapped**.
 
-## 🔐 Authentication Flow
-This flow applies to users who use **IccRecapped** without being authenticated via the ICC app.
+This  applies to users who clicked the `enter recapped` button on the WebView **IccRecapped** without being authenticated via the ICC app.
 
-When calling the SDK, pass an authentication interface as an argument:
+When calling the SDK, pass an authentication interface as an argument, handle sign in the document and launch the sdk again:
 
 ```kotlin
 val onAuthenticate = object : OnAuthenticate {
     override fun signIn() {
-        val param = SdkParam(user)
-        IccWrappedActivity.launch(this@MainActivity, param, null)
+        IccRecappedActivity.launch(this@MainActivity, user, onStayInGame = {})
+    }
+
+    override fun onNavigateBack() {
+       // when on back pressed is called
     }
 }
 ```
 
-In this interface, the `signIn()` function handles authentication and then launches the SDK with the user object.
 
-This flow is triggered when the **`enter recapped` button is clicked on the WebView**, and the user is authenticated on **IccRecapped**.
+
+In this interface, 
+1. The `signIn()` function handles authentication and then launches the SDK with the user object.
+2. The `onNavigateBack()` function is triggered when the user presses back on the SDK.
 
 ---
