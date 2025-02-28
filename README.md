@@ -1,4 +1,4 @@
-# ICC Wrapped Android SDK
+# ICC Recapped Android SDK
 
 An Android SDK that provides a simple way to launch a web view in Android applications.
 
@@ -84,7 +84,7 @@ val onAuthenticate = object : OnAuthenticate {
 ```
 
 ### **Delegate Sign-in to ICC**
-`onStayInGame` is a function passed into the sdk during initialization it gets invoked when the ICC wrapped is completed and the user clicks on the `ICC CRICKET` button as shown below.
+`onStayInGame` is a function passed into the sdk during initialization it gets invoked when the ICC recapped is completed and the user clicks on the `ICC CRICKET` button as shown below.
 
 ![PHOTO-2025-02-27-16-03-15](https://github.com/user-attachments/assets/c5af385a-a0fe-4c55-86ff-22d414fd40c6)
 
@@ -113,15 +113,16 @@ enum class Environment {
 ```
 
 ### **Authentication Delegation**
-This interface helps with sign-in delegation when the user attempts to sign in via **IccWrapped**.
+This interface helps with sign-in delegation when the user attempts to sign in via **IccRecapped**.
 
 
 ### **Stay in Game (onStayInGame) **
-This interface helps  close the SDK and invoke a callback that the SDK caller can use to navigate to another part of the ICC APP after the wrapped experience is completed.
+The idea is for the `stayInGame` callback to close the sdk and then D3 team can do anything afterwards. or would D3 prefer to have another callback for when the SDK is closed.
+
 ---
 
 ## 🔐 Authentication Flow
-This flow applies to users who use **IccWrapped** without being authenticated via the ICC app.
+This flow applies to users who use **IccRecapped** without being authenticated via the ICC app.
 
 When calling the SDK, pass an authentication interface as an argument:
 
@@ -136,6 +137,6 @@ val onAuthenticate = object : OnAuthenticate {
 
 In this interface, the `signIn()` function handles authentication and then launches the SDK with the user object.
 
-This flow is triggered when the **`enter wrapped` button is clicked on the WebView**, and the user is authenticated on **IccWrapped**.
+This flow is triggered when the **`enter recapped` button is clicked on the WebView**, and the user is authenticated on **IccRecapped**.
 
 ---
