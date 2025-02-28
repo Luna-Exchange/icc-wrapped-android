@@ -117,7 +117,7 @@ This interface helps with sign-in delegation when the user attempts to sign in v
 
 
 ### **Stay in Game (onStayInGame) **
-The idea is for the `stayInGame` callback to close the sdk and then D3 team can do anything afterwards. or would D3 prefer to have another callback for when the SDK is closed.
+This interface closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recap experience is completed.
 
 ---
 
