@@ -123,8 +123,7 @@ When calling the SDK, pass an authentication interface as an argument, handle si
 ```kotlin
 val onAuthenticate = object : OnAuthenticate {
     override fun signIn() {
-        val param = SdkParam(user)
-        IccWrappedActivity.launch(this@MainActivity, param, null)
+        IccRecappedActivity.launch(this@MainActivity, user, onStayInGame = {})
     }
 
     override fun onNavigateBack() {
