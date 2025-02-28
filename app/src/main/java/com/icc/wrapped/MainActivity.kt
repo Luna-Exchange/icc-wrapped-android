@@ -30,10 +30,13 @@ class MainActivity : AppCompatActivity() {
                 IccWrappedActivity.launch(this@MainActivity, user, onStayInGame = {})
             }
 
+            override fun onNavigateBack() {
+                Toast.makeText(this@MainActivity, "On Navigate back", Toast.LENGTH_LONG).show()
+            }
+
         }
 
-        IccWrappedActivity.launch(context = this, env = Env.DEVELOPMENT, onStayInGame = {
-            Toast.makeText(this, "we did it", Toast.LENGTH_LONG).show()
+        IccWrappedActivity.launch(context = this, user = user, env = Env.DEVELOPMENT, onStayInGame = {
         }, onAuthenticate = onAuthenticate)
     }
 }
