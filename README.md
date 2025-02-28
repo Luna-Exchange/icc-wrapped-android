@@ -117,7 +117,7 @@ This interface helps with sign-in delegation when the user attempts to sign in v
 
 
 ### **Stay in Game (onStayInGame) **
-This interface closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recap experience is completed.
+This interface closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recapped experience is completed.
 
 ---
 
