@@ -138,4 +138,7 @@ In this interface,
 1. The `signIn()` function handles authentication and then launches the SDK with the user object.
 2. The `onNavigateBack()` function is triggered when the user presses back on the SDK.
 
+**Permissions**
+
+The SDK automatically requests for permissions if enabled it loads the ICC wrapped experience if it is not enabled it's forces the user to enable before launching the webview
 ---
