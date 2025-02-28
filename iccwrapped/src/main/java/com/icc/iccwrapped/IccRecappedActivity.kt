@@ -33,7 +33,7 @@ import java.io.FileOutputStream
 
 const val STORAGE_PERMISSION_CODE = 1001
 
-class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebViewInterface {
+class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebViewInterface {
 
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
@@ -228,6 +228,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     override fun onAuthenticateWithIcc() {
             SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+            finish()
             onAuthenticate?.signIn()
     }
 
@@ -328,7 +329,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
             sharedPrefProvider.saveAccessToken(token)
             this.onAuthenticate = onAuthenticate
             this.onStayInGame = onStayInGame
-            val intent = Intent(context, IccWrappedActivity::class.java)
+            val intent = Intent(context, IccRecappedActivity::class.java)
             intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
         }

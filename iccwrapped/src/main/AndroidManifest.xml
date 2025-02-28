@@ -9,7 +9,7 @@
 
     <application android:networkSecurityConfig="@xml/network_security_config">
         <activity
-            android:name=".IccWrappedActivity"
+            android:name=".IccRecappedActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
