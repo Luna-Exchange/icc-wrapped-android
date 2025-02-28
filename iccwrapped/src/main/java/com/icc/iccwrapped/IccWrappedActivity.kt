@@ -107,7 +107,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     private fun downloadFile(
         url: String,
         message: String,
-        type: DownloadType = DownloadType.DOWNLOAD
+        type: IccFileDownloadType = IccFileDownloadType.DOWNLOAD
     ) {
         if (url.startsWith("data:image")) {
             downloadBase64Image(url, message, type)
@@ -117,9 +117,9 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
     }
 
 
-    private fun downloadBase64Image(base64Data: String, message: String = "", type: DownloadType) {
+    private fun downloadBase64Image(base64Data: String, message: String = "", type: IccFileDownloadType) {
         try {
-            if (type == DownloadType.DOWNLOAD) {
+            if (type == IccFileDownloadType.DOWNLOAD) {
                 Toast.makeText(this, "downloading...", Toast.LENGTH_SHORT).show()
             }
             val base64Image = base64Data.substringAfter("base64,")
@@ -141,7 +141,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
             mediaScanIntent.data = Uri.fromFile(file)
             sendBroadcast(mediaScanIntent)
 
-            if (type == DownloadType.SHARE) {
+            if (type == IccFileDownloadType.SHARE) {
                 shareIccWrapped(getImageUri(file), message)
             } else {
                 Toast.makeText(this, "Image downloaded", Toast.LENGTH_SHORT).show()
@@ -239,7 +239,7 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onShareRecapped(message: String, image: String) {
-        downloadFile(image, message, type = DownloadType.SHARE)
+        downloadFile(image, message, type = IccFileDownloadType.SHARE)
     }
 
     override fun onPageStarted() {
@@ -353,4 +353,8 @@ class IccWrappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebView
 interface OnAuthenticate {
     fun signIn()
     fun onNavigateBack()
+}
+
+enum class IccFileDownloadType {
+    DOWNLOAD, SHARE
 }
