@@ -11,6 +11,9 @@
         android:theme="@style/Theme.Iccwrapped"
         tools:targetApi="31">
         <activity
+            android:name="com.icc.wrapped.SecondActivity"
+            android:exported="false" />
+        <activity
             android:name="com.icc.wrapped.MainActivity"
             android:exported="true">
             <intent-filter>
