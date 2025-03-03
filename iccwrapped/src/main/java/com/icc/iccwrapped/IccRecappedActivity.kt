@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 
 
 const val STORAGE_PERMISSION_CODE = 1001
@@ -248,7 +247,6 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
 
     override fun onClose() {
-        finish()
         onStayInGame?.invoke()
     }
 
