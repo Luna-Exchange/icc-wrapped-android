@@ -223,6 +223,8 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
             is Result.Failed -> {
                 Timber.e("Unable to encode user")
+                val url = config.iccUi
+                loadUrlWithWebView(url)
             }
 
             is Result.Default -> {}
