@@ -3,10 +3,10 @@ package com.icc.iccwrapped
 class EnvConfig(private val env: Env = Env.DEVELOPMENT) {
 
     val iccUi : String
-        get() = if (env == Env.DEVELOPMENT) "https://icc-wrapped-frontend.vercel.app" else "https://icc-wrapped.insomnialabs.xyz"
+        get() = if (env == Env.DEVELOPMENT) "https://iccwrapped-ui-dev.aws.insomnialabs.xyz" else "https://recapped.icc-cricket.com"
 
     val iccApi : String
-        get() = if (env == Env.DEVELOPMENT) "https://icc-fan-passport-stg-api.insomnialabs.xyz" else "https://passport-api.icc-cricket.com"
+        get() = if (env == Env.DEVELOPMENT) "https://iccwrapped-api-dev.aws.insomnialabs.xyz" else "https://recapped-api.icc-cricket.com"
 
 }
 

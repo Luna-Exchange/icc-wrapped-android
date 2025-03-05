@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object WrappedApiClient {
 
-    fun create(baseUrl : String): FanPassportAPIService {
+    fun create(baseUrl : String): WrappedAPIService {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(createOkHttpClient())
@@ -15,7 +15,7 @@ object WrappedApiClient {
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
 
-        return retrofit.create(FanPassportAPIService::class.java)
+        return retrofit.create(WrappedAPIService::class.java)
     }
 
     private fun createOkHttpClient(): OkHttpClient {
