@@ -25,7 +25,7 @@ implementation("com.github.Luna-Exchange:icc-wrapped-android:x.x.x")
 ```groovy
 implementation 'com.github.Luna-Exchange:icc-wrapped-android:x.x.x'
 ```
-Replace `x.x.x` with the latest version (`1.0.4`).
+Replace `x.x.x` with the latest version (`1.0.8`).
 
 ### 2️⃣ Configure `settings.gradle`
 
