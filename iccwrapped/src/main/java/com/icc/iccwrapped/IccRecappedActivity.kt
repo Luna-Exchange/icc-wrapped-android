@@ -29,6 +29,7 @@ import com.icc.iccwrapped.extensions.openShareSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 
@@ -182,7 +183,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         val token = sharedPrefProvider.getAccessToken()
         if (token.isEmpty()) {
             clearWebViewCache()
-            val url = "${config.iccUi}?wrapped_access=${token}&icc_client=mobile_app"
+            val url = "${config.iccUi}?recapped_access={token}"
             loadUrlWithWebView(url)
         } else {
             encodeUser(arguments?.user)
@@ -221,7 +222,9 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             }
 
             is Result.Failed -> {
-                finish()
+                Timber.e("Unable to encode user")
+                val url = config.iccUi
+                loadUrlWithWebView(url)
             }
 
             is Result.Default -> {}
@@ -230,7 +233,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
     private fun loadUrlBasedOnActions() {
         val token = sharedPrefProvider.getAccessToken()
-        val url = "${config.iccUi}?wrapped_access=${token}&icc_client=mobile_app"
+        val url = "${config.iccUi}?recapped_access=${token}"
         loadUrlWithWebView(url)
     }
 
@@ -247,6 +250,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
 
     override fun onClose() {
+        finish()
         onStayInGame?.invoke()
     }
 

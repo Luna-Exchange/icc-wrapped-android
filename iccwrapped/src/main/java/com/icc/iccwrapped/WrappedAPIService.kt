@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface FanPassportAPIService {
+interface WrappedAPIService {
     @POST("/auth/encode")
     suspend fun encode(@Body user: User): AuthResponse
 
