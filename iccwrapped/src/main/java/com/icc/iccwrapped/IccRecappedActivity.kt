@@ -129,7 +129,8 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         try {
             withContext(Dispatchers.Main) {
                 if (type == IccFileDownloadType.DOWNLOAD) {
-                    Toast.makeText(this@IccRecappedActivity, "Downloading...", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@IccRecappedActivity, "Downloading...", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
@@ -138,7 +139,10 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
             val fileName = "icc_recapped_${System.currentTimeMillis()}.png"
-            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+            val file = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                fileName
+            )
 
             withContext(Dispatchers.IO) {
                 file.outputStream().use { outputStream ->
@@ -154,13 +158,21 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             withContext(Dispatchers.Main) {
                 when (type) {
                     IccFileDownloadType.SHARE -> shareIccWrapped(getImageUri(file), message)
-                    IccFileDownloadType.DOWNLOAD -> Toast.makeText(this@IccRecappedActivity, "Image downloaded", Toast.LENGTH_SHORT).show()
+                    IccFileDownloadType.DOWNLOAD -> Toast.makeText(
+                        this@IccRecappedActivity,
+                        "Image downloaded",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@IccRecappedActivity, "Failed to download image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@IccRecappedActivity,
+                    "Failed to download image",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -170,7 +182,10 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         this.openShareSheet(imageUri, message)
     }
 
-
+    override fun onStayInTheGame() {
+        finish()
+        onStayInGame?.invoke()
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun requestManageExternalStoragePermission() {
@@ -180,14 +195,22 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     }
 
     private fun openWrappedExperience() {
-        val token = sharedPrefProvider.getAccessToken()
-        if (token.isEmpty()) {
+        if (!isUserValid()) {
             clearWebViewCache()
-            val url = "${config.iccUi}?recapped_access={token}"
-            loadUrlWithWebView(url)
+            loadUrlWithWebView(config.iccUi)
         } else {
             encodeUser(arguments?.user)
             observeViewModel()
+        }
+    }
+
+    private fun isUserValid() : Boolean {
+        return if( arguments?.user?.email.isNullOrEmpty()) {
+            false
+        } else if (arguments?.user?.authToken.isNullOrEmpty()) {
+            false
+        } else {
+            true
         }
     }
 
@@ -243,9 +266,9 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
 
     override fun onAuthenticateWithIcc() {
-            SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
-            finish()
-            onAuthenticate?.signIn()
+        SharedPrefProvider(this).saveState(SdkActions.SIGN_IN)
+        finish()
+        onAuthenticate?.signIn()
     }
 
 
@@ -271,6 +294,9 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     });
         window.parent.addEventListener('close-icc-wrapped', function(event) {
             Android.receiveCloseEvent(JSON.stringify(event));
+    });
+        window.parent.addEventListener('go-to-stay-in-the-game', function(event) {
+            Android.goToStayInTheGame(JSON.stringify(event));
     });
         window.parent.addEventListener('share-icc-wrapped', function(event) {    
             console.log(event.detail.image);
@@ -321,19 +347,23 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     companion object {
         const val PARAM_EXTRA = "PARAM_EXTRA"
         private var onAuthenticate: OnAuthenticate? = null
-        private var onStayInGame : (() -> Unit)? = null
+        private var onStayInGame: (() -> Unit)? = null
 
         fun launch(
             context: Activity,
             user: User? = null,
             env: Env = Env.DEVELOPMENT,
-            onStayInGame : (() -> Unit)? = null,
+            onStayInGame: (() -> Unit)? = null,
             onAuthenticate: OnAuthenticate? = null,
         ) {
             val param = SdkParam(env = env)
+            var iccUser = user
             val sdkParam = if (user != null) {
+                if (user.name.isEmpty()) {
+                    iccUser = user.copy(name = "User")
+                }
                 param.copy(
-                    user = user,
+                    user = iccUser,
                     action = SdkActions.SIGN_IN,
                     env = env
                 )
