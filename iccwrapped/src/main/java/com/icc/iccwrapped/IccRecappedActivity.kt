@@ -195,14 +195,22 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     }
 
     private fun openWrappedExperience() {
-        val token = sharedPrefProvider.getAccessToken()
-        if (token.isEmpty()) {
+        if (!isUserValid()) {
             clearWebViewCache()
-            val url = "${config.iccUi}?recapped_access={token}"
-            loadUrlWithWebView(url)
+            loadUrlWithWebView(config.iccUi)
         } else {
             encodeUser(arguments?.user)
             observeViewModel()
+        }
+    }
+
+    private fun isUserValid() : Boolean {
+        return if( arguments?.user?.email.isNullOrEmpty()) {
+            false
+        } else if (arguments?.user?.authToken.isNullOrEmpty()) {
+            false
+        } else {
+            true
         }
     }
 
@@ -349,9 +357,13 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             onAuthenticate: OnAuthenticate? = null,
         ) {
             val param = SdkParam(env = env)
+            var iccUser = user
             val sdkParam = if (user != null) {
+                if (user.name.isEmpty()) {
+                    iccUser = user.copy(name = "User")
+                }
                 param.copy(
-                    user = user,
+                    user = iccUser,
                     action = SdkActions.SIGN_IN,
                     env = env
                 )
