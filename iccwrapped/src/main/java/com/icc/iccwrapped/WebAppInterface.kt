@@ -26,6 +26,12 @@ class WebAppInterface(private val onJavScriptInterface: OnJavScriptInterface) {
         return true
     }
 
+    @JavascriptInterface
+    fun goToStayInTheGame(data: String) : Boolean {
+        onJavScriptInterface.onStayInTheGame()
+        return true
+    }
+
 }
 
 interface OnJavScriptInterface{
@@ -33,6 +39,8 @@ interface OnJavScriptInterface{
     fun onAuthenticateWithIcc()
 
     fun onClose() {}
+
+    fun onStayInTheGame()
 
     fun onShareRecapped(message: String, image: String)
 
