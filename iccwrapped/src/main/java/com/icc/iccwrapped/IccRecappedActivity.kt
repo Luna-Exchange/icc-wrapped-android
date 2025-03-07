@@ -17,7 +17,6 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -197,9 +196,8 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
     private fun openWrappedExperience() {
         if (!isUserValid()) {
-            val url = "${config.iccUi}?recapped_access={token}"
             clearWebViewCache()
-            loadUrlWithWebView(url)
+            loadUrlWithWebView(config.iccUi)
         } else {
             encodeUser(arguments?.user)
             observeViewModel()
@@ -243,7 +241,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         when (result) {
             is Result.Success -> {
                 sharedPrefProvider.saveAccessToken(result.token)
-                loadUrlBasedOnActions()
+                loadAuthenticatedUrl()
             }
 
             is Result.Failed -> {
@@ -256,7 +254,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         }
     }
 
-    private fun loadUrlBasedOnActions() {
+    private fun loadAuthenticatedUrl() {
         val token = sharedPrefProvider.getAccessToken()
         val url = "${config.iccUi}?recapped_access=${token}"
         loadUrlWithWebView(url)
@@ -350,6 +348,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         const val PARAM_EXTRA = "PARAM_EXTRA"
         private var onAuthenticate: OnAuthenticate? = null
         private var onStayInGame: (() -> Unit)? = null
+        private var onDestroyCalled : (() -> Unit)? = null
 
         fun launch(
             context: Activity,
@@ -357,12 +356,15 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             env: Env = Env.DEVELOPMENT,
             onStayInGame: (() -> Unit)? = null,
             onAuthenticate: OnAuthenticate? = null,
+            onDestroyCalled: (() -> Unit)? = null
         ) {
             val param = SdkParam(env = env)
             var iccUser = user
             val sdkParam = if (user != null) {
                 if (user.name.isEmpty()) {
-                    iccUser = user.copy(name = "User")
+                    iccUser = user.copy(name = "Your Name")
+                } else if (user.email.isEmpty()) {
+                    iccUser = user.copy(email = "test@example.com")
                 }
                 param.copy(
                     user = iccUser,
@@ -377,6 +379,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             sharedPrefProvider.saveAccessToken(token)
             this.onAuthenticate = onAuthenticate
             this.onStayInGame = onStayInGame
+            this.onDestroyCalled = onDestroyCalled
             val intent = Intent(context, IccRecappedActivity::class.java)
             intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
@@ -395,6 +398,11 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         webView.clearHistory()
         webView.clearSslPreferences()
         WebStorage.getInstance().deleteAllData()
+    }
+
+    override fun onDestroy() {
+        onDestroyCalled?.invoke()
+        super.onDestroy()
     }
 }
 

@@ -25,7 +25,7 @@ implementation("com.github.Luna-Exchange:icc-wrapped-android:x.x.x")
 ```groovy
 implementation 'com.github.Luna-Exchange:icc-wrapped-android:x.x.x'
 ```
-Replace `x.x.x` with the latest version (`1.0.4`).
+Replace `x.x.x` with the latest version (`1.0.11`).
 
 ### 2️⃣ Configure `settings.gradle`
 
@@ -94,10 +94,12 @@ The SDK launch function accepts arguments:
 ```kotlin
 val userData = User(
     token = "user_token",
-    name = "User Name",
-    email = "user@example.com"
+    name = "Your Name",
+    email = "test@example.com"
 )
 ```
+
+When the name or email of the user is not available, pass `Your Name` in place of `name` and `test@example.com` in place of `email`.
 
 ### **Environment**
 The `Env` enum is used to specify the SDK environment:
@@ -110,7 +112,10 @@ enum class Env {
 ```
 
 ### **Stay in Game callback (onStayInGame) **
-This interface closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recapped experience is completed.
+This callback when invoked closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recapped experience is completed.
+
+### **on Destroy called callback (onDestroyCalled) **
+This callback when invoked notifies the caller that onDestroy has been called in the sdk and the sdk is about to close
 
 ---
 ### **Authentication Delegation**
@@ -123,6 +128,7 @@ When calling the SDK, pass an authentication interface as an argument, handle si
 ```kotlin
 val onAuthenticate = object : OnAuthenticate {
     override fun signIn() {
+        // call the sdk again with the user data as referenced above
         IccRecappedActivity.launch(this@MainActivity, user, onStayInGame = {})
     }
 

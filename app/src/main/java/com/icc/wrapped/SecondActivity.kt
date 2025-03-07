@@ -26,13 +26,11 @@ class SecondActivity : AppCompatActivity() {
         val onAuthenticate = object : OnAuthenticate {
             override fun signIn() {
 
-                val user = User(
-                    authToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImtJUG5DTU1xanhWbjJ4UFNwTnN2QXpLcHdNSEtvOWo0UmdZUXVJVzFWQ2MiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJlYjI1MjZlNy0zZTVlLTQwNmUtODc4Zi1iZmIxZjc2YWYwZmYiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmljYy1jcmlja2V0LmNvbS80YmE5ZjI3Ni0yNDk3LTQ0MGUtYTZiYS1kMDVkNDgzMWI5NjcvdjIuMC8iLCJleHAiOjE3NDEzNjAyMjYsIm5iZiI6MTc0MTM1OTkyNiwic3ViIjoiZGJlMTk4Y2ItMDdiYy00ZTczLThiZDktMGI0YWJlNDY2YTNlIiwiZ2l2ZW5fbmFtZSI6Ikl5YW51IiwiZmFtaWx5X25hbWUiOiJGYWxheWUiLCJuYW1lIjoiSXlhbnUgRmFsYXllIiwiZW1haWxzIjpbIml5YW51b2x1d2FAaW5zb21uaWFsYWJzLmlvIl0sImNvdW50cnkiOiJORyIsImpvYlRpdGxlIjoiIiwidGlkIjoiNGJhOWYyNzYtMjQ5Ny00NDBlLWE2YmEtZDA1ZDQ4MzFiOTY3IiwidGZwIjoiQjJDXzFBX1NpZ25pblNpZ251cCIsIm5vbmNlIjoiODNlYzE0NzAtNWY3NC00ZDE4LWE5MjAtZTY3ZDJkMzI0MWFjIiwic2NwIjoiY2F0YWxvZ3VlLnJlYWQiLCJhenAiOiIzNmRhNjA1NC04NTUyLTQwMTUtYTZiMi1iN2I2OTA2ZmQ0YWIiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE3NDEzNTk5MjZ9.poGSF2ChCrQCPOPFTbqtZOzty8V0woWdKJtB6a_LgeAE8FsebZ2NE_WPvE7ssznBkWTziY3MaI9SqRtGUMUR1M1QDT3N5sjn2RIzZv6D2GGBorG6ovQvVHxj0abbvyqphCnz-f9qG9VyOIZM7ncGAgMn-LgHRT2J2--ViXJua04czIbQ8JQDaDXEbAQ4ZVQ0eI8n9m0SsxLcqjiFeLXnIScIBm5n6THNnOzcQj_TLAj3oTXeMvqUrTWKBUscOzDi0xWSmecX1qPkbNo513Ozy8v-2AhhfteYSgznMHNcceVzWzE93GLGaUNOaXYHJ7R81aB_tzjMRKXApxzFbupgXA",
-                    name = "",
-                    email = "iyanuoluwa@insomnialabs.io"
-                )
+                val user = User("", "", "")
 
-                IccRecappedActivity.launch(this@SecondActivity, user, onStayInGame = {})
+                IccRecappedActivity.launch(this@SecondActivity,
+                    user,
+                    env = Env.PRODUCTION, onStayInGame = {})
             }
 
             override fun onNavigateBack() {
@@ -41,16 +39,15 @@ class SecondActivity : AppCompatActivity() {
 
         }
 
-        val user = User(
-            authToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImtJUG5DTU1xanhWbjJ4UFNwTnN2QXpLcHdNSEtvOWo0UmdZUXVJVzFWQ2MiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJlYjI1MjZlNy0zZTVlLTQwNmUtODc4Zi1iZmIxZjc2YWYwZmYiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmljYy1jcmlja2V0LmNvbS80YmE5ZjI3Ni0yNDk3LTQ0MGUtYTZiYS1kMDVkNDgzMWI5NjcvdjIuMC8iLCJleHAiOjE3NDEzNjAyMjYsIm5iZiI6MTc0MTM1OTkyNiwic3ViIjoiZGJlMTk4Y2ItMDdiYy00ZTczLThiZDktMGI0YWJlNDY2YTNlIiwiZ2l2ZW5fbmFtZSI6Ikl5YW51IiwiZmFtaWx5X25hbWUiOiJGYWxheWUiLCJuYW1lIjoiSXlhbnUgRmFsYXllIiwiZW1haWxzIjpbIml5YW51b2x1d2FAaW5zb21uaWFsYWJzLmlvIl0sImNvdW50cnkiOiJORyIsImpvYlRpdGxlIjoiIiwidGlkIjoiNGJhOWYyNzYtMjQ5Ny00NDBlLWE2YmEtZDA1ZDQ4MzFiOTY3IiwidGZwIjoiQjJDXzFBX1NpZ25pblNpZ251cCIsIm5vbmNlIjoiODNlYzE0NzAtNWY3NC00ZDE4LWE5MjAtZTY3ZDJkMzI0MWFjIiwic2NwIjoiY2F0YWxvZ3VlLnJlYWQiLCJhenAiOiIzNmRhNjA1NC04NTUyLTQwMTUtYTZiMi1iN2I2OTA2ZmQ0YWIiLCJ2ZXIiOiIxLjAiLCJpYXQiOjE3NDEzNTk5MjZ9.poGSF2ChCrQCPOPFTbqtZOzty8V0woWdKJtB6a_LgeAE8FsebZ2NE_WPvE7ssznBkWTziY3MaI9SqRtGUMUR1M1QDT3N5sjn2RIzZv6D2GGBorG6ovQvVHxj0abbvyqphCnz-f9qG9VyOIZM7ncGAgMn-LgHRT2J2--ViXJua04czIbQ8JQDaDXEbAQ4ZVQ0eI8n9m0SsxLcqjiFeLXnIScIBm5n6THNnOzcQj_TLAj3oTXeMvqUrTWKBUscOzDi0xWSmecX1qPkbNo513Ozy8v-2AhhfteYSgznMHNcceVzWzE93GLGaUNOaXYHJ7R81aB_tzjMRKXApxzFbupgXA",
-            name = "",
-            email = "iyanuoluwa@insomnialabs.io"
-        )
+        val user = User("", "", "")
 
         IccRecappedActivity.launch(context = this,
-            env = Env.DEVELOPMENT,
+            env = Env.PRODUCTION,
             onStayInGame = {
             Toast.makeText(this@SecondActivity, "onStayInGame", Toast.LENGTH_LONG).show()
-        }, onAuthenticate = onAuthenticate)
+        }, onAuthenticate = onAuthenticate,
+            onDestroyCalled = {
+                Toast.makeText(this@SecondActivity, "onDestroy", Toast.LENGTH_LONG).show()
+            })
     }
 }
