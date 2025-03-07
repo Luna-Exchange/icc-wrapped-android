@@ -112,6 +112,8 @@ enum class Env {
 }
 ```
 
+PS : Default envionment is DEVELOPMENT
+
 ### **Stay in Game callback (onStayInGame) **
 This callback when invoked closes the SDK and provides a callback that allows the SDK caller to navigate to another section of the ICC app after the recapped experience is completed.
 
