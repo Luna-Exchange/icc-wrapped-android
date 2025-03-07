@@ -23,19 +23,14 @@ class SecondActivity : AppCompatActivity() {
             insets
         }
 
-        val user = User(
-            authToken = "",
-            name = "",
-            email = ""
-        )
-
         val onAuthenticate = object : OnAuthenticate {
             override fun signIn() {
-                val user = User(
-                    authToken = "",  name = "",
-                    email = ""
-                )
-                IccRecappedActivity.launch(this@SecondActivity, user, onStayInGame = {})
+
+                val user = User("", "", "")
+
+                IccRecappedActivity.launch(this@SecondActivity,
+                    user,
+                    env = Env.PRODUCTION, onStayInGame = {})
             }
 
             override fun onNavigateBack() {
@@ -44,10 +39,15 @@ class SecondActivity : AppCompatActivity() {
 
         }
 
+        val user = User("", "", "")
+
         IccRecappedActivity.launch(context = this,
-            env = Env.DEVELOPMENT,
+            env = Env.PRODUCTION,
             onStayInGame = {
             Toast.makeText(this@SecondActivity, "onStayInGame", Toast.LENGTH_LONG).show()
-        }, onAuthenticate = onAuthenticate)
+        }, onAuthenticate = onAuthenticate,
+            onDestroyCalled = {
+                Toast.makeText(this@SecondActivity, "onDestroy", Toast.LENGTH_LONG).show()
+            })
     }
 }
