@@ -17,6 +17,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -196,8 +197,9 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
     private fun openWrappedExperience() {
         if (!isUserValid()) {
+            val url = "${config.iccUi}?recapped_access={token}"
             clearWebViewCache()
-            loadUrlWithWebView(config.iccUi)
+            loadUrlWithWebView(url)
         } else {
             encodeUser(arguments?.user)
             observeViewModel()
