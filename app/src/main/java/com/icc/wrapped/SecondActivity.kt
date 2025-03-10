@@ -26,10 +26,18 @@ class SecondActivity : AppCompatActivity() {
         val onAuthenticate = object : OnAuthenticate {
             override fun signIn() {
 
-                val user = User("", "", "")
+                val user = User(
+                    authToken = "", name = "",
+                    email = ""
+                )
+
+                val user1 = User(
+                    authToken = "", name = "",
+                    email = ""
+                )
 
                 IccRecappedActivity.launch(this@SecondActivity,
-                    user,
+                    user1,
                     env = Env.PRODUCTION, onStayInGame = {})
             }
 
@@ -39,15 +47,19 @@ class SecondActivity : AppCompatActivity() {
 
         }
 
-        val user = User("", "", "")
+        val user1 = User(
+            authToken = "", name = "",
+            email = ""
+        )
 
         IccRecappedActivity.launch(context = this,
             env = Env.PRODUCTION,
             onStayInGame = {
             Toast.makeText(this@SecondActivity, "onStayInGame", Toast.LENGTH_LONG).show()
         }, onAuthenticate = onAuthenticate,
-            onDestroyCalled = {
+            onDestroy = {
                 Toast.makeText(this@SecondActivity, "onDestroy", Toast.LENGTH_LONG).show()
+
             })
     }
 }
