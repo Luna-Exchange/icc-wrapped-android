@@ -152,7 +152,6 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             
             withContext(Dispatchers.IO) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    // Android 10 and above - use MediaStore API
                     val contentValues = ContentValues().apply {
                         put(MediaStore.Downloads.DISPLAY_NAME, fileName)
                         put(MediaStore.Downloads.MIME_TYPE, "image/png")
