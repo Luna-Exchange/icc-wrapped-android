@@ -44,7 +44,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'io.insomnialabs'
                 artifactId = 'wrapped'
-                version = '1.0.8'
+                version = '1.0.12'
             }
         }
     }
