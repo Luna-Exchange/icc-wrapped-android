@@ -1,6 +1,7 @@
 package com.icc.iccwrapped
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,23 +10,23 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings
+import android.provider.MediaStore
 import android.view.View
 import android.webkit.ConsoleMessage
+import android.webkit.GeolocationPermissions
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.icc.iccwrapped.extensions.getImageUri
-import com.icc.iccwrapped.extensions.openShareSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,21 +48,16 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     private var shouldRefresh = true
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_icc_wrapped)
         setupAndOpenWrapped()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupAndOpenWrapped() {
         setupViews()
         setupConfig()
         setupWebView()
-        if (!Environment.isExternalStorageManager()) {
-            requestManageExternalStoragePermission()
-        }
         openWrappedExperience()
     }
 
@@ -76,36 +72,49 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         arguments = intent.getParcelableExtra(PARAM_EXTRA)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupWebView() {
         webView = findViewById(R.id.web_view)
+
+        
         val webSettings = webView.settings
-        webSettings.javaScriptCanOpenWindowsAutomatically = true
-        webSettings.javaScriptEnabled = true
-        webSettings.domStorageEnabled = true
+        webSettings.apply {
+            javaScriptCanOpenWindowsAutomatically = true
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            setSupportZoom(true)
+            builtInZoomControls = true
+            displayZoomControls = false
+            loadWithOverviewMode = true
+            useWideViewPort = true
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            allowFileAccess = true
+            allowContentAccess = true
+            databaseEnabled = true
+            setGeolocationEnabled(true)
+            cacheMode = WebSettings.LOAD_NO_CACHE
+        }
+        
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
         webView.webViewClient = IccWebViewClient(this)
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                return super.onConsoleMessage(consoleMessage)
+                consoleMessage?.let {
+                    Timber.d("WebView Console: ${it.message()}")
+                }
+                return true
+            }
+
+            override fun onGeolocationPermissionsShowPrompt(origin: String?, callback: GeolocationPermissions.Callback?) {
+                callback?.invoke(origin, true, false)
             }
         }
 
         webView.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (!Environment.isExternalStorageManager()) {
-                    requestManageExternalStoragePermission()
-                } else {
-                    downloadFile(url, contentDisposition)
-                }
-            } else {
-                downloadFile(url, contentDisposition)
-            }
+            downloadFile(url, contentDisposition)
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun downloadFile(
         url: String,
         message: String,
@@ -139,25 +148,44 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
             val fileName = "icc_recapped_${System.currentTimeMillis()}.png"
-            val file = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                fileName
-            )
-
+            var savedUri: Uri? = null
+            
             withContext(Dispatchers.IO) {
-                file.outputStream().use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // Android 10 and above - use MediaStore API
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                        put(MediaStore.Downloads.MIME_TYPE, "image/png")
+                    }
 
-                val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).apply {
-                    data = Uri.fromFile(file)
+                    savedUri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                    savedUri?.let {
+                        contentResolver.openOutputStream(it)?.use { outputStream ->
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        }
+                    }
+                } else {
+                    val file = File(
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                        fileName
+                    )
+                    file.outputStream().use { outputStream ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    }
+
+                    val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).apply {
+                        data = Uri.fromFile(file)
+                    }
+                    sendBroadcast(mediaScanIntent)
+                    savedUri = getImageUri(file)
                 }
-                sendBroadcast(mediaScanIntent)
             }
 
             withContext(Dispatchers.Main) {
                 when (type) {
-                    IccFileDownloadType.SHARE -> shareIccWrapped(getImageUri(file), message)
+                    IccFileDownloadType.SHARE -> {
+                        savedUri?.let { shareIccWrapped(it, message) }
+                    }
                     IccFileDownloadType.DOWNLOAD -> Toast.makeText(
                         this@IccRecappedActivity,
                         "Image downloaded",
@@ -179,19 +207,18 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
 
 
     private fun shareIccWrapped(imageUri: Uri, message: String) {
-        this.openShareSheet(imageUri, message)
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/*"
+            putExtra(Intent.EXTRA_STREAM, imageUri)
+            putExtra(Intent.EXTRA_TEXT, message)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share via"))
     }
 
     override fun onStayInTheGame() {
         finish()
         onStayInGame?.invoke()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun requestManageExternalStoragePermission() {
-        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-        intent.data = Uri.parse("package:$packageName")
-        startActivity(intent)
     }
 
     private fun openWrappedExperience() {
@@ -223,7 +250,6 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -277,7 +303,6 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
         onStayInGame?.invoke()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onShareRecapped(message: String, image: String) {
         downloadFile(image, message, type = IccFileDownloadType.SHARE)
     }
@@ -335,11 +360,6 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
                     "Permission denied. Enable storage permission in settings.",
                     Toast.LENGTH_SHORT
                 ).show()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.data = Uri.parse("package:$packageName")
-                    startActivity(intent)
-                }
             }
         }
     }
@@ -356,7 +376,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             env: Env = Env.DEVELOPMENT,
             onStayInGame: (() -> Unit)? = null,
             onAuthenticate: OnAuthenticate? = null,
-            onDestroyCalled: (() -> Unit)? = null
+            onDestroy: (() -> Unit)? = null
         ) {
             val param = SdkParam(env = env)
             var iccUser = user
@@ -379,7 +399,7 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
             sharedPrefProvider.saveAccessToken(token)
             this.onAuthenticate = onAuthenticate
             this.onStayInGame = onStayInGame
-            this.onDestroyCalled = onDestroyCalled
+            this.onDestroyCalled = onDestroy
             val intent = Intent(context, IccRecappedActivity::class.java)
             intent.putExtra(PARAM_EXTRA, sdkParam)
             context.startActivity(intent)
@@ -393,11 +413,15 @@ class IccRecappedActivity : AppCompatActivity(), OnJavScriptInterface, IccWebVie
     }
 
     private fun clearWebViewCache() {
-        webView.clearCache(true);
-        webView.clearFormData()
-        webView.clearHistory()
-        webView.clearSslPreferences()
-        WebStorage.getInstance().deleteAllData()
+        try {
+            webView.clearCache(true)
+            webView.clearFormData()
+            webView.clearHistory()
+            webView.clearSslPreferences()
+            WebStorage.getInstance().deleteAllData()
+        } catch (e: Exception) {
+            Timber.e(e, "Error clearing WebView cache")
+        }
     }
 
     override fun onDestroy() {
